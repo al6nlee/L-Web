@@ -1,0 +1,15 @@
+# Django stuff:
+*.log
+logs/
+
+
+# PyCharm
+# http://www.jetbrains.com/pycharm/webhelp/project.html
+.idea
+.iml
+static/
+# virtualenv
+venv/
+
+
+conf/conf.ini
