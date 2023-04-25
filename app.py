@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, request
 
 from src.scheduled_task.scheduled import Config, scheduler
+from src.utils.validate_request import validate_request
 
 app = Flask(__name__)
 
@@ -14,6 +15,16 @@ def index():  # put application's code here
     """
     return 'Hello World!'
 
+
+@app.before_request
+def before_request():
+    # 获取请求的数据
+    cookies = request.cookies
+    cookie = cookies.get("Cookie", "")
+    # 进行效验
+    if not validate_request(cookie, None):
+        # 若效验不通过，返回错误信息
+        return '未登录', 400
 
 @app.after_request
 def after_request(response):
