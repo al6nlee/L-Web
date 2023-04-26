@@ -3,7 +3,7 @@ services:
   # 可自定义
   web:
     # 可自定义，作为docker构建容器镜像的标签
-    image: myweb:v1.0
+    image: myweb:v1.1
     # 可自定义，作为挂载的目录
     volumes:
       - ./:/L-Web
