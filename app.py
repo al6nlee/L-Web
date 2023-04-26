@@ -2,9 +2,10 @@ import datetime
 import os
 
 from redis import Redis
-from flask import Flask, request, Response, jsonify, redirect, session
+from flask import Flask, request, Response, jsonify, redirect, session, render_template
 from flask_session import Session
 from src.scheduled_task.scheduled import Config, scheduler
+from src.utils.conf_section import get_conf_section
 from src.utils.validate_request import validate_request
 
 app = Flask(__name__)
@@ -17,13 +18,14 @@ def index():  # put application's code here
     首页
     :return:
     """
-    return 'Hello World!'
+    # @app.route('/index')
+    return render_template('index.html')
 
-
+print(get_conf_section('REDIS', 'IP'))
 app.config['SESSION_TYPE'] = 'redis'  # session存储格式为redis
 app.config['SESSION_REDIS'] = Redis(  # redis的服务器参数
-    host='139.196.169.148',  # 服务器地址
-    port=6379)  # 服务器端口
+    host=get_conf_section('REDIS', 'IP'),  # 服务器地址
+    port=int(get_conf_section('REDIS', 'PORT')))  # 服务器端口
 app.config['SESSION_USE_SIGNER'] = True  # 是否强制加盐，混淆session
 app.config['SECRET_KEY'] = os.urandom(24)  # 如果加盐，那么必须设置的安全码，盐
 app.config['SESSION_PERMANENT'] = False  # sessons是否长期有效，false，则关闭浏览器，session失效
@@ -97,6 +99,12 @@ scheduler.start()
 # 定时任务功能code end
 
 
+# 蓝图导入
+from src.chatgpt import urls as chatgpt
+
+# 蓝图注册
+app.register_blueprint(chatgpt.bp)
+
+
 if __name__ == '__main__':
-    app.wsgi_app
     app.run(host="0.0.0.0", port=5000, debug=True)

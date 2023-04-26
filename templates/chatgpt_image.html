@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}chatGPT{% endblock %}
+
+{% block content %}
+    <script>
+        $(document).ready(function () {
+            $("#get-image-btn").click(function () {
+                var input_prompt = $("#input-text").val();
+                var select_size = $("#select-size").val();
+                $.ajax({
+                    url: "/chatgpt/get_chatgpt_image",
+                    type: "POST",
+                    data: {
+                        input_prompt: input_prompt,
+                        select_size: select_size
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $("#output-image").attr("src", response.image);
+                    },
+                    error: function () {
+                        alert("获取图片失败！");
+                    }
+                });
+            });
+        });
+    </script>
+    <form>
+        输入：<input type="text" name="input-text" id="input-text" size="150" autocomplete="off">
+        size：<select name="select-size" id="select-size">
+        <option value="256x256">256x256</option>
+        <option value="512x512">512x512</option>
+        <option value="1024x1024" selected>1024x1024</option>
+    </select>
+        <input type="button" id="get-image-btn" value="获取图片" style="margin-top: 20px;"><br>
+    </form>
+    <img id="output-image" style="margin-top: 20px;">
+
+{% endblock %}
+
+
+
+

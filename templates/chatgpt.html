@@ -1,0 +1,139 @@
+{#{% extends "base.html" %}#}
+{##}
+{#{% block title %}chatGPT{% endblock %}#}
+{##}
+{#{% block content %}#}
+{#    <form>#}
+{#        <label for="input">输入：</label>#}
+{#        <input type="text" name="input" id="input" size="200">#}
+{#        <button type="button" onclick="submitForm()">提交</button>#}
+{#        <br>#}
+{#        <br>#}
+{#        <label for="output">输出：</label>#}
+{#        <textarea name="output" id="output" cols="200" rows="40" readonly></textarea>#}
+{##}
+{#    </form>#}
+{#    <script>#}
+{#        function submitForm() {#}
+{#            let input = $("#input").val();  // 获取输入框内容#}
+{#            $.ajax({#}
+{#                type: "POST",#}
+{#                url: "/chatgpt/get_chatgpt_text",#}
+{#                data: {input: input},#}
+{#                dataType: "json",#}
+{#                success: function (response) {#}
+{#                    $("#output").val(response.output);  // 将返回值赋值给输出框#}
+{#                }#}
+{#            });#}
+{#        }#}
+{#    </script>#}
+{#{% endblock %}#}
+{##}
+{##}
+{% extends "base.html" %}
+
+{% block title %}chatGPT{% endblock %}
+
+{% block content %}
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="text_id" data-toggle="tab" onclick="change_chatgpt_type()">文字</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="image_id" data-toggle="tab" onclick="change_chatgpt_type()">图片</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="text" class="tab-pane fade show active">
+            <form>
+                <label for="input">输入：</label>
+                <input type="text" name="input" id="input" size="200">
+                <button type="button" onclick="submitTextForm()">提交</button>
+                <br>
+                <br>
+                <label for="output">输出：</label>
+                <textarea name="output" id="output" cols="200" rows="40" readonly></textarea>
+            </form>
+        </div>
+
+        <div id="image" class="tab-pane fade" style="display:none">
+            <form>
+                输入：<input type="text" name="input-text" id="input-text" size="150" autocomplete="off">
+                size：<select name="select-size" id="select-size">
+                <option value="256x256">256x256</option>
+                <option value="512x512">512x512</option>
+                <option value="1024x1024" selected>1024x1024</option>
+            </select>
+                <button type="button" onclick="submitImageForm()">获取图片</button>
+                <br>
+                <br>
+                <img id="output-image" style="margin-top: 20px;">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function change_chatgpt_type() {
+            const div1 = document.getElementById("text");
+            const div2 = document.getElementById("image");
+            const link1 = document.getElementById("text_id");
+            const link2 = document.getElementById("image_id");
+
+            link1.addEventListener("click", () => {
+              div1.style.display = "block";
+              div2.style.display = "none";
+            });
+
+            link2.addEventListener("click", () => {
+              div2.style.display = "block";
+              div1.style.display = "none";
+            });
+
+            // 默认显示第一个div
+            div1.style.display = "block";
+            div2.style.display = "none";
+        }
+
+        function submitTextForm() {
+            let input = $("#input").val();  // 获取输入框内容
+            $.ajax({
+                type: "POST",
+                url: "/chatgpt/get_chatgpt_text",
+                data: {input: input},
+                dataType: "json",
+                success: function (response) {
+                    $("#output").val(response.output);  // 将返回值赋值给输出框
+                }
+            });
+        }
+
+        function submitImageForm() {
+            var input_prompt = $("#input-text").val();
+            var select_size = $("#select-size").val();
+            $.ajax({
+                url: "/chatgpt/get_chatgpt_image",
+                type: "POST",
+                data: {
+                    input_prompt: input_prompt,
+                    select_size: select_size
+                },
+                dataType: "json",
+                success: function (response) {
+                    $("#output-image").attr("src", response.image);
+                },
+                error: function () {
+                    alert("获取图片失败！");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $('.nav-link').on('click', function () {
+                let tabId = $(this).attr('href');
+                $('.tab-pane').removeClass('show active');
+                $(tabId).addClass('show active');
+            });
+        });
+    </script>
+{% endblock %}
