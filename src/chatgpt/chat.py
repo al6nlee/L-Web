@@ -1,10 +1,12 @@
 import openai
 
 from src.chatgpt.const import API_KEY, CHARACTER_DESC, MAX_TOKEN, MODEL_ENGINE, MODEL
+from src.utils.conf_section import get_conf_section
 
 
 class GPT(object):
     openai.api_key = API_KEY
+    openai.proxy = f'http://{get_conf_section("PROXY", "IP")}:{get_conf_section("PROXY", "PORT")}'
 
     def __init__(self):
         self.api_key = API_KEY
@@ -15,6 +17,8 @@ class GPT(object):
 
     def get(self):
         pass
+
+
 class ChatGPT(GPT):
     def __init__(self):
         super(ChatGPT, self).__init__()
